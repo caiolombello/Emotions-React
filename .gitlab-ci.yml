@@ -1,0 +1,58 @@
+image: node:8
+
+stages:
+  - test
+  - package
+  - deploy
+
+test app:
+  stage: test
+  before_script:
+      - npm install -g wait-on
+  script:
+      - npm install && npm run start & 
+      - wait-on http://localhost:3000 --timeout 120000
+      - curl http://localhost:3000
+  tags:
+    - docker
+
+
+package app:
+  stage: package
+  cache:
+    key: app_cache
+    policy: push
+  artifacts:
+    name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
+    when: always
+    expire_in: 2 hrs
+    paths:
+      -  ./build
+  script:
+    - npm install
+    - npm run build
+  tags:
+    - docker
+        
+deploy app prd:
+  stage: deploy
+  variables:
+    CNAME: emotions.cbarbieri.surge.sh
+    GIT_STRATEGY: none
+  cache:
+    key: app_cache
+    policy: pull
+  before_script:
+    - npm install -g surge  
+  script:
+    - surge --project ./build --domain ${CNAME}
+  environment:
+    name: prd
+    url: http://${CNAME}
+  only:
+    - main
+  tags:
+    - docker
+
+
+

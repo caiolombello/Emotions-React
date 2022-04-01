@@ -33,26 +33,6 @@ package app:
     - npm run build
   tags:
     - docker
-        
-deploy app dev:
-  stage: deploy
-  variables:
-    CNAME: dev.emotions.cbarbieri.surge.sh
-    GIT_STRATEGY: none
-  cache:
-    key: app_cache
-    policy: pull
-  before_script:
-    - npm install -g surge 
-  script:
-    - surge --project ./build --domain ${CNAME}
-  environment:
-    name: dev
-    url: http://${CNAME}
-  only:
-    - dev
-  tags:
-    - docker
 
 deploy app prd:
   stage: deploy
@@ -73,26 +53,5 @@ deploy app prd:
     - main
   tags:
     - docker
-
-deploy app hmg:
-  stage: deploy
-  variables:
-    CNAME: hmg.emotions.cbarbieri.surge.sh
-    GIT_STRATEGY: none
-  cache:
-    key: app_cache
-    policy: pull
-  before_script:
-    - npm install -g surge 
-  script:
-    - surge --project ./build --domain ${CNAME}
-  environment:
-    name: dev
-    url: http://${CNAME}
-  only:
-    - hmg
-  tags:
-    - docker
-
 
 
